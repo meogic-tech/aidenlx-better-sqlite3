@@ -14,6 +14,7 @@
     "binding.gyp",
     "src/*.[ch]pp",
     "lib/**",
+    "index.d.ts",
     "deps/**"
   ],
   "dependencies": {
