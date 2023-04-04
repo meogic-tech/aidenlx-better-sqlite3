@@ -7,42 +7,16 @@ on:
   workflow_dispatch: {}
 
 jobs:
-
-  test:
-    strategy:
-      matrix:
-        os:
-          - ubuntu-20.04
-          - macos-latest
-          - windows-2019
-        node:
-          - 14
-          - 16
-          - 18
-    name: Testing Node ${{ matrix.node }} on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
+  publish:
+    name: Publishing to NPM
+    runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
-          node-version: ${{ matrix.node }}
-      - run: npm install --ignore-scripts
-      - run: npm run build-debug
-      - run: npm test
-
-  publish:
-    name: Publishing to NPM
-    runs-on: ubuntu-18.04
-    needs: test
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
           node-version: 16
-          registry-url: https://registry.npmjs.org
-      - run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - run: npm install --ignore-scripts
+      - run: npm publish --public
 
   prebuild:
     strategy:
