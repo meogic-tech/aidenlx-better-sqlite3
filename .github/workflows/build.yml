@@ -7,6 +7,20 @@ on:
   workflow_dispatch: {}
 
 jobs:
+  publish:
+    name: Publishing to NPM
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          registry-url: https://registry.npmjs.org
+      - run: npm install --ignore-scripts
+      - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
   prebuild:
     strategy:
       matrix:
@@ -16,6 +30,7 @@ jobs:
           - windows-2019
     name: Prebuild on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
+    needs: publish
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -33,6 +48,7 @@ jobs:
     name: Prebuild on alpine
     runs-on: ubuntu-latest
     container: node:16-alpine
+    needs: publish
     steps:
       - uses: actions/checkout@v3
       - run: apk add build-base git python3 --update-cache
@@ -47,6 +63,7 @@ jobs:
           - arm64
     name: Prebuild on alpine (${{ matrix.arch }})
     runs-on: ubuntu-latest
+    needs: publish
     steps:
       - uses: actions/checkout@v3
       - uses: docker/setup-qemu-action@v1
@@ -64,6 +81,7 @@ jobs:
           - arm64
     name: Prebuild on Linux (${{ matrix.arch }})
     runs-on: ubuntu-latest
+    needs: publish
     steps:
       - uses: actions/checkout@v3
       - uses: docker/setup-qemu-action@v1
